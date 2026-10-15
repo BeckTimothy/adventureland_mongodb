@@ -13961,7 +13961,11 @@ function defeated_by_a_monster(attacker, player) {
 		player.socket.emit("game_log", localization.message("server.game_log.lost_1_level", {}));
 	}
 	player.socket.emit("game_response", { response: "defeated_by_a_monster", xp: lost_xp, monster: attacker.type });
-	if (attacker.target) {
+	// Only drop pursuit when the dead player was the monster's target.
+	// Splash / packed kills of bystanders used to clear tank aggro via
+	// `if (attacker.target)` — e.g. mrpumpkin targeting a priest, killing a
+	// stacked merchant, then stop_pursuit(defeat) → priest lost aggro.
+	if (attacker.target === player.name) {
 		stop_pursuit(attacker, { force: true, cause: "defeat" });
 	}
 	rip(player);
