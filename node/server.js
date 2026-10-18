@@ -1624,16 +1624,6 @@ function calculate_player_stats(player) {
 		max(player.dex - 160, 0) / 925.0 +
 		player.int / 1575.0; // 120 635 1275 is the original mix
 	// player.frequency=9000;
-	player.attack_ms = round(1000.0 / player.frequency);
-	if (player.last_attack_ms && player.attack_ms != player.last_attack_ms) {
-		// server_log("skill_timeout_correction: "+player.last_attack_ms+" to "+player.attack_ms+" timeout: "+(player.attack_ms-mssince(player.last.attack)))
-		player.socket.emit("skill_timeout", {
-			name: "attack",
-			ms: player.attack_ms - mssince(player.last.attack),
-			reason: "attack_ms",
-		});
-	}
-	player.last_attack_ms = player.attack_ms;
 	player.mp_cost +=
 		min(player.level, 80) * (player.mp_cost / 10.0) +
 		player.a_mp_cost +
@@ -1713,7 +1703,20 @@ function calculate_player_stats(player) {
 	if (player.s.dash) {
 		player.speed = 500;
 	}
+
 	calculate_common_stats(player);
+
+	player.attack_ms = round(1000.0 / player.frequency);
+	if (player.last_attack_ms && player.attack_ms != player.last_attack_ms) {
+		// server_log("skill_timeout_correction: "+player.last_attack_ms+" to "+player.attack_ms+" timeout: "+(player.attack_ms-mssince(player.last.attack)))
+		player.socket.emit("skill_timeout", {
+			name: "attack",
+			ms: player.attack_ms - mssince(player.last.attack),
+			reason: "attack_ms",
+		});
+	}
+
+	player.last_attack_ms = player.attack_ms;
 
 	player.tax =
 		(player.level > 80 && 0.01) ||
