@@ -4035,6 +4035,7 @@ function complete_attack(attacker, target, info) {
 								!G.conditions[name].persistent) ||
 							target.s[name].citizens
 						) {
+							if (G.conditions[name] === "stack" && attacker.is_player && target?.cooperative) continue;
 							delete target.s[name];
 							attack += 400;
 							info.first_attack += 400;
